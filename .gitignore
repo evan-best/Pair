@@ -1,0 +1,11 @@
+# Xcode
+*.xcconfig
+.DS_Store
+xcuserdata/
+*.xccheckout
+*.moved-to-trash
+DerivedData/
+
+# Swift Package Manager
+.build/
+.swiftpm/
