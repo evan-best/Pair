@@ -7,12 +7,9 @@
 
 import Foundation
 
-
 enum TMDBError: Error {
-	case noData
 	case invalidResponse
 	case invalidData
-	case unknown
 }
 
 struct TMDBSearchResponse: Codable {
@@ -21,36 +18,36 @@ struct TMDBSearchResponse: Codable {
 
 @Observable
 final class TMDBService {
-	
-	private let baseURL = URL(string: Bundle.main.infoDictionary?["TMDB_BASE_URL"] as! String)!
-	private let apiKey = Bundle.main.infoDictionary?["TMDB_API_KEY"] as! String
-	
+
+	private let baseURL = URL(string: "https://api.themoviedb.org")!
+	private let accessToken = Bundle.main.infoDictionary?["TMDB_READ_TOKEN"] as! String
+
 	private func fetch<T: Decodable>(_ url: URL) async throws -> T {
-		let (data, urlResponse) = try await URLSession.shared.data(from: url)
-		
+		var request = URLRequest(url: url)
+		request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+
+		let (data, urlResponse) = try await URLSession.shared.data(for: request)
+
 		guard let httpResponse = urlResponse as? HTTPURLResponse,
 			  httpResponse.statusCode == 200 else {
 			throw TMDBError.invalidResponse
 		}
-		
-		return try JSONDecoder().decode(T.self, from: data)
+
+		let decoder = JSONDecoder()
+		decoder.keyDecodingStrategy = .convertFromSnakeCase
+		return try decoder.decode(T.self, from: data)
 	}
-	
-	
 	/// Search for movies using TMDB API
 	/// - Parameter query: Query for searching.
-	/// - Returns: MovieResponse object (search results).
+	/// - Returns: Array of MovieResponse objects (search results).
 	func searchMovies(query: String) async throws -> [MovieResponse] {
 		var components = URLComponents(url: baseURL, resolvingAgainstBaseURL: true)!
-		components.path.append("/search/movie")
+		components.path = "/3/search/movie"
 		components.queryItems = [
-			URLQueryItem(name: "api_key", value: apiKey),
-			URLQueryItem(name: "query", value: query),
+			URLQueryItem(name: "query", value: query)
 		]
-		
+
 		let response: TMDBSearchResponse = try await fetch(components.url!)
 		return response.results
-		
 	}
-	
 }
