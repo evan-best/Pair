@@ -5,4 +5,14 @@
 //  Created by Evan Best on 2026-05-02.
 //
 
-import Foundation
+import SwiftUI
+
+struct WatchView: View {
+	var body: some View {
+		Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+	}
+}
+
+#Preview {
+	WatchView()
+}
