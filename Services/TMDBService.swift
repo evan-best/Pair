@@ -19,35 +19,34 @@ struct TMDBSearchResponse: Codable {
 @Observable
 final class TMDBService {
 
-	private let baseURL = URL(string: "https://api.themoviedb.org")!
-	private let accessToken = Bundle.main.infoDictionary?["TMDB_READ_TOKEN"] as! String
+	private let client = APIClient(
+		baseURL: URL(string: "https://api.themoviedb.org")!,
+		authHeaderValue:
+			"Bearer \(Bundle.main.infoDictionary?["TMDB_READ_TOKEN"] as! String)"
+	)
 
-	private func fetch<T: Decodable>(_ url: URL) async throws -> T {
-		var request = URLRequest(url: url)
-		request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
-
-		let (data, urlResponse) = try await URLSession.shared.data(for: request)
-
-		guard let httpResponse = urlResponse as? HTTPURLResponse,
-			  httpResponse.statusCode == 200 else {
-			throw TMDBError.invalidResponse
-		}
-
-		let decoder = JSONDecoder()
-		decoder.keyDecodingStrategy = .convertFromSnakeCase
-		return try decoder.decode(T.self, from: data)
+	/// Fetch popular movies from TMDB API.
+	/// - Returns: Array of MovieResponse objects (results).
+	func fetchPopularMovies() async throws -> [MovieResponse] {
+		let response: TMDBSearchResponse = try await client.fetch(
+			"/3/movie/popular"
+		)
+		return response.results.prefix(4).map { $0 }
 	}
+
 	/// Search for movies using TMDB API
 	/// - Parameter query: Query for searching.
 	/// - Returns: Array of MovieResponse objects (search results).
 	func searchMovies(query: String) async throws -> [MovieResponse] {
-		var components = URLComponents(url: baseURL, resolvingAgainstBaseURL: true)!
-		components.path = "/3/search/movie"
-		components.queryItems = [
-			URLQueryItem(name: "query", value: query)
-		]
-
-		let response: TMDBSearchResponse = try await fetch(components.url!)
+		let response: TMDBSearchResponse = try await client.fetch(
+			"/3/search/movie",
+			queryItems: [
+				URLQueryItem(
+					name: "query",
+					value: query
+				)
+			]
+		)
 		return response.results
 	}
 }

@@ -5,8 +5,8 @@
 //  Created by Evan Best on 2026-04-22.
 //
 
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 enum Tabs {
 	case watch
@@ -16,14 +16,14 @@ enum Tabs {
 }
 
 struct ContentView: View {
-    @Environment(\.modelContext) private var modelContext
-    @State private var selectedTab: Tabs = .watch
-	
-    var body: some View {
-        TabView(selection: $selectedTab) {
-            Tab("Watch", systemImage: "play", value: .watch) {
-				WatchView()
-            }
+	@Environment(\.modelContext) private var modelContext
+	@State private var selectedTab: Tabs = .watch
+
+	var body: some View {
+		TabView(selection: $selectedTab) {
+			Tab("Watch", systemImage: "play", value: .watch) {
+				WatchContentView()
+			}
 			Tab("Cook", systemImage: "play", value: .cook) {
 				CookView()
 			}
@@ -33,10 +33,10 @@ struct ContentView: View {
 			Tab("List", systemImage: "play", value: .list) {
 				ListView()
 			}
-        }
-    }
+		}
+	}
 }
 
 #Preview {
-    ContentView()
+	ContentView()
 }
