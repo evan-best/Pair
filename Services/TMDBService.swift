@@ -10,28 +10,59 @@ import Foundation
 enum TMDBError: Error {
 	case invalidResponse
 	case invalidData
+	case missingToken
 }
 
 struct TMDBSearchResponse: Codable {
 	let results: [MovieResponse]
 }
 
+struct TMDBCategory: Codable {
+	let id: Int
+	let name: String
+}
+
 @Observable
 final class TMDBService {
+	private let baseURL = URL(string: "https://api.themoviedb.org")!
 
-	private let client = APIClient(
-		baseURL: URL(string: "https://api.themoviedb.org")!,
-		authHeaderValue:
-			"Bearer \(Bundle.main.infoDictionary?["TMDB_READ_TOKEN"] as! String)"
-	)
+	private var client: APIClient {
+		get throws {
+			guard
+				let token = Bundle.main.infoDictionary?["TMDB_READ_TOKEN"] as? String,
+				!token.isEmpty,
+				!token.contains("$(")
+			else {
+				throw TMDBError.missingToken
+			}
 
-	/// Fetch popular movies from TMDB API.
+			return APIClient(
+				baseURL: baseURL,
+				authHeaderValue: "Bearer \(token)"
+			)
+		}
+	}
+
+	/// Fetch top rated movies from TMDB API.
 	/// - Returns: Array of MovieResponse objects (results).
-	func fetchPopularMovies() async throws -> [MovieResponse] {
+	func fetchTopRated() async throws -> [MovieResponse] {
 		let response: TMDBSearchResponse = try await client.fetch(
-			"/3/movie/popular"
+			"/3/movie/top_rated"
 		)
-		return response.results.prefix(4).map { $0 }
+		return response.results
+	}
+	
+	/// Fetch movies playing in theatres.
+	/// - Returns: Array of MovieResponse objects (results).
+	func fetchNowPlaying() async throws -> [MovieResponse] {
+		let response: TMDBSearchResponse = try await client.fetch(
+			"/3/movie/now_playing",
+			queryItems: [
+				URLQueryItem(name: "language", value: "en-US"),
+				URLQueryItem(name: "page", value: "1")
+			]
+		)
+		return response.results
 	}
 
 	/// Search for movies using TMDB API

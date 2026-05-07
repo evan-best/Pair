@@ -12,8 +12,12 @@ final class WatchViewModel {
 	let service = TMDBService()
 
 	// MARK: Featured
-	var popularMovies = [MovieResponse]()
-	var isFetchingPopular: Bool = false
+	var topRatedMovies = [MovieResponse]()
+	var isFetchingTopRated: Bool = false
+	
+	// MARK: Now Playing
+	var nowPlayingMovies = [MovieResponse]()
+	var isFetchingNowPlaying: Bool = false
 	
 	// MARK: Search
 	var searchResults = [MovieResponse]()
@@ -23,25 +27,42 @@ final class WatchViewModel {
 	var error: String? = nil
 
 	
-	func fetchPopular() async {
-		isFetchingPopular = true
-		defer { isFetchingPopular = false }
+	func fetchTopRated() async {
+		isFetchingTopRated = true
+		defer { isFetchingTopRated = false }
 		do {
-			popularMovies = try await service.fetchPopularMovies()
+			topRatedMovies = try await service.fetchTopRated()
 		} catch {
 			self.error = error.localizedDescription
 		}
-		isFetchingPopular = false
+	}
+	
+	func fetchNowPlaying() async {
+		isFetchingNowPlaying = true
+		defer { isFetchingNowPlaying = false }
+		do {
+			nowPlayingMovies = try await service.fetchNowPlaying()
+		} catch {
+			self.error = error.localizedDescription
+		}
 	}
 	
 	func search() async {
-		guard !searchTerm.isEmpty else { return }
+		let query = searchTerm.trimmingCharacters(in: .whitespacesAndNewlines)
+		guard !query.isEmpty else {
+			searchResults = []
+			error = nil
+			return
+		}
+
 		isSearching = true
+		error = nil
 
 		defer { isSearching = false }
 		do {
-			searchResults = try await service.searchMovies(query: searchTerm)
+			searchResults = try await service.searchMovies(query: query)
 		} catch {
+			searchResults = []
 			self.error = error.localizedDescription
 		}
 	}

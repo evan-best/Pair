@@ -2,11 +2,11 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>TMDB_READ_TOKEN</key>
+	<string>$(TMDB_READ_TOKEN)</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>
 	</array>
-	<key>TMDB_READ_TOKEN</key>
-	<string>$(TMDB_READ_TOKEN)</string>
 </dict>
 </plist>
