@@ -11,26 +11,32 @@ struct WatchMainView: View {
 	let watchVM: WatchViewModel
 
 	var body: some View {
-		ScrollView {
-			VStack(alignment: .leading, spacing: 12) {
-				MovieRowSection(
-					title: "Top Rated",
-					movies: watchVM.topRatedMovies
-				)
-				.padding(.top, 8)
+		GeometryReader { proxy in
+			ScrollView {
+				VStack(alignment: .leading, spacing: 12) {
+					MovieRowSection(
+						title: "Trending Now",
+						movies: watchVM.topRatedMovies
+					)
+					.padding(.top, 12)
 
-				MovieRowSection(
-					title: "Now Playing in Theatres",
-					movies: watchVM.nowPlayingMovies
-				)
-			}
-			.task {
-				if watchVM.topRatedMovies.isEmpty {
-					await watchVM.fetchTopRated()
+					MovieRowSection(
+						title: "Now Playing in Theatres",
+						movies: watchVM.nowPlayingMovies
+					)
 				}
+				.task {
+					if watchVM.featuredMovies.isEmpty {
+						await watchVM.fetchFeatured()
+					}
 
-				if watchVM.nowPlayingMovies.isEmpty {
-					await watchVM.fetchNowPlaying()
+					if watchVM.topRatedMovies.isEmpty {
+						await watchVM.fetchTopRated()
+					}
+
+					if watchVM.nowPlayingMovies.isEmpty {
+						await watchVM.fetchNowPlaying()
+					}
 				}
 			}
 		}
@@ -61,14 +67,14 @@ private struct SectionHeader: View {
 	let title: String
 
 	var body: some View {
-		HStack(spacing: 4) {
+		HStack(alignment: .firstTextBaseline, spacing: 4) {
 			Text(title)
 				.font(.title2)
 				.fontWeight(.semibold)
-
 			Image(systemName: "chevron.right")
-				.font(.subheadline.weight(.semibold))
-				.foregroundStyle(.tertiary)
+				.font(.system(size: 16))
+				.fontWeight(.semibold)
+				.foregroundStyle(.secondary)
 		}
 		.padding(.horizontal, 16)
 	}
@@ -79,56 +85,23 @@ private struct MovieCardItem: View {
 
 	private let cardWidth: CGFloat = 110
 	private let cardHeight: CGFloat = 160
-	private let cornerRadius: CGFloat = 16
+	private let cornerRadius: CGFloat = 14
 
 	var body: some View {
-		posterContent
-			.frame(width: cardWidth, height: cardHeight)
-			.clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
-			.glassEffect(
-				.regular,
-				in: .rect(cornerRadius: 16, style: .continuous)
-			)
-	}
-
-	private var posterContent: some View {
-		Group {
-			if let posterURL {
-				AsyncImage(url: posterURL) { phase in
-					switch phase {
-					case .success(let image):
-						image
-							.resizable()
-							.scaledToFill()
-
-					default:
-						posterFallback
-					}
-				}
-			} else {
-				posterFallback
-			}
-		}
-	}
-
-	private var posterURL: URL? {
-		guard
-			let posterPath = movie.posterPath?.trimmingCharacters(in: .whitespacesAndNewlines),
-			!posterPath.isEmpty
-		else {
-			return nil
-		}
-
-		return URL(string: "https://image.tmdb.org/t/p/w342\(posterPath)")
-	}
-
-	private var posterFallback: some View {
-		Rectangle()
-			.fill(Color.gray.opacity(0.3))
-			.overlay {
-				Image(systemName: "film")
-					.foregroundStyle(.secondary)
-			}
+		TMDBImageView(
+			path: movie.posterPath,
+			size: .poster,
+			contentMode: .fill,
+			fallbackSystemImage: "film"
+		)
+		.frame(width: cardWidth, height: cardHeight)
+		.clipShape(
+			RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+		)
+		.glassEffect(
+			.regular,
+			in: .rect(cornerRadius: 16, style: .continuous)
+		)
 	}
 }
 

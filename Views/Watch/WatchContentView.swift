@@ -20,7 +20,6 @@ struct WatchContentView: View {
 					WatchMainView(watchVM: watchVM)
 				}
 			}
-			.navigationTitle("Watch")
 		}
 		.searchable(text: $watchVM.searchTerm, prompt: "Search movies")
 		.autocorrectionDisabled()

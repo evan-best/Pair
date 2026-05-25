@@ -25,7 +25,7 @@ struct TMDBCategory: Codable {
 @Observable
 final class TMDBService {
 	private let baseURL = URL(string: "https://api.themoviedb.org")!
-
+	
 	private var client: APIClient {
 		get throws {
 			guard
@@ -35,14 +35,27 @@ final class TMDBService {
 			else {
 				throw TMDBError.missingToken
 			}
-
+			
 			return APIClient(
 				baseURL: baseURL,
 				authHeaderValue: "Bearer \(token)"
 			)
 		}
 	}
-
+	
+	/// Fetch this week's trending movies from TMDB API.
+	/// - Returns: Array of MovieResponse objects (results).
+	func fetchFeatured() async throws -> [MovieResponse] {
+		let response: TMDBSearchResponse = try await client.fetch(
+			"/3/trending/movie/week",
+			queryItems: [
+				URLQueryItem(name: "limit", value: "5")
+			]
+		)
+		print(response)
+		return response.results
+	}
+	
 	/// Fetch top rated movies from TMDB API.
 	/// - Returns: Array of MovieResponse objects (results).
 	func fetchTopRated() async throws -> [MovieResponse] {

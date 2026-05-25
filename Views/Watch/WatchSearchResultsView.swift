@@ -45,21 +45,12 @@ private struct MovieSearchResultRow: View {
 
 	var body: some View {
 		HStack(alignment: .top, spacing: 12) {
-			AsyncImage(url: URL(string: "https://image.tmdb.org/t/p/w342\(movie.posterPath ?? "")")) { phase in
-				switch phase {
-				case .success(let image):
-					image
-						.resizable()
-						.scaledToFill()
-				default:
-					Rectangle()
-						.fill(Color.gray.opacity(0.2))
-						.overlay {
-							Image(systemName: "film")
-								foregroundStyle(.secondary)
-						}
-				}
-			}
+			TMDBImageView(
+				path: movie.posterPath,
+				size: .poster,
+				contentMode: .fill,
+				fallbackSystemImage: "film"
+			)
 			.frame(width: 88, height: 128)
 			.clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
 

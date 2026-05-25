@@ -19,6 +19,9 @@ final class WatchViewModel {
 	var nowPlayingMovies = [MovieResponse]()
 	var isFetchingNowPlaying: Bool = false
 	
+	// MARK: Featured (Weekly)
+	var featuredMovies = [MovieResponse]()
+	var isFetchingFeatured = false
 	// MARK: Search
 	var searchResults = [MovieResponse]()
 	var searchTerm: String = ""
@@ -32,6 +35,17 @@ final class WatchViewModel {
 		defer { isFetchingTopRated = false }
 		do {
 			topRatedMovies = try await service.fetchTopRated()
+		} catch {
+			self.error = error.localizedDescription
+		}
+	}
+	
+	func fetchFeatured() async {
+		isFetchingFeatured = true
+		
+		defer { isFetchingFeatured = false }
+		do {
+			featuredMovies = try await service.fetchFeatured()
 		} catch {
 			self.error = error.localizedDescription
 		}
