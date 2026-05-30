@@ -18,3 +18,18 @@ struct MovieResponse: Codable, Identifiable {
 	let releaseDate: String?
 	let genreIds: [Int]
 }
+
+struct MovieImagesResponse: Decodable {
+	let id: Int
+	let logos: [MovieImage]
+}
+
+struct MovieImage: Decodable, Identifiable {
+	let filePath: String
+	let iso6391: String?
+	let voteAverage: Double
+	let width: Int
+	let height: Int
+
+	var id: String { filePath }
+}

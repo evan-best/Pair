@@ -80,4 +80,14 @@ final class WatchViewModel {
 			self.error = error.localizedDescription
 		}
 	}
+	
+	func fetchLogo(for id: Int) async -> String? {
+		do {
+			let logo = try await service.fetchLogo(for: id)
+			return logo
+		} catch {
+			self.error = error.localizedDescription
+			return nil
+		}
+	}
 }

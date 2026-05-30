@@ -63,4 +63,10 @@ final class CoreDataStack {
 		container.viewContext.automaticallyMergesChangesFromParent = true
 		container.viewContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
 	}
+	
+	func addToWatchList(_ response: MovieResponse) throws {
+		
+	}
 }
+
+

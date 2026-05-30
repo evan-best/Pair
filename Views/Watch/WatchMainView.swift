@@ -46,7 +46,9 @@ struct WatchMainView: View {
 private struct MovieRowSection: View {
 	let title: String
 	let movies: [MovieResponse]
-
+	
+	@Namespace private var namespace
+	
 	var body: some View {
 		VStack(alignment: .leading, spacing: 4) {
 			SectionHeader(title: title)
@@ -54,7 +56,13 @@ private struct MovieRowSection: View {
 			ScrollView(.horizontal, showsIndicators: false) {
 				HStack(spacing: 6) {
 					ForEach(movies, id: \.id) { movie in
-						MovieCardItem(movie: movie)
+						NavigationLink {
+							MovieDetailView(movie: movie)
+								.navigationTransition(.zoom(sourceID: movie.id, in: namespace))
+						} label: {
+							MovieCardItem(movie: movie)
+								.matchedTransitionSource(id: movie.id, in: namespace)
+						}
 					}
 				}
 				.padding(.horizontal, 16)

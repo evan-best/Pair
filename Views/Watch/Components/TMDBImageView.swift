@@ -32,7 +32,6 @@ struct TMDBImageView: View {
                 TMDBImagePlaceholder(systemImage: fallbackSystemImage)
             }
         }
-        .background(Color.gray.opacity(0.18))
     }
 
     private var imageURL: URL? {
@@ -67,6 +66,8 @@ extension TMDBImageView {
 enum TMDBImageSize: String {
     case poster = "w342"
     case hero = "w780"
+	case backdrop = "w1280"
+	case logo = "w500"
 }
 
 private struct TMDBImagePlaceholder: View {
@@ -74,15 +75,6 @@ private struct TMDBImagePlaceholder: View {
 
     var body: some View {
         ZStack {
-            LinearGradient(
-                colors: [
-                    Color.gray.opacity(0.18),
-                    Color.gray.opacity(0.28)
-                ],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-
             Image(systemName: systemImage)
                 .font(.title2.weight(.medium))
                 .foregroundStyle(.secondary)

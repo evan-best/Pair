@@ -93,4 +93,28 @@ final class TMDBService {
 		)
 		return response.results
 	}
+	
+	func fetchProviders(for id: Int, region: String = "CA") async throws -> CountryProviders? {
+		let response: WatchProvidersResponse = try await client.fetch(
+			"/3/movie/\(id)/watch/providers"
+		)
+		return response.results[region]
+	}
+	
+	
+	/// Fetch the logo for a movie.
+	/// - Parameters:
+	///   - id: Movie ID.
+	///   - language: Language of logo.
+	/// - Returns: MovieImageResponse.
+	func fetchLogo(for id: Int, language: String = "en") async throws -> String? {
+		let response: MovieImagesResponse = try await client.fetch(
+			"/3/movie/\(id)/images"
+		)
+		
+		// prefer the requested language, fall back to any, prefer highest-voted
+		let preferred = response.logos.filter { $0.iso6391 == language }
+		let pool = preferred.isEmpty ? response.logos : preferred
+		return pool.max(by: { $0.voteAverage < $1.voteAverage })?.filePath
+	}
 }
