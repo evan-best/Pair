@@ -99,8 +99,7 @@ private struct MovieCardItem: View {
 		TMDBImageView(
 			path: movie.posterPath,
 			size: .poster,
-			contentMode: .fill,
-			fallbackSystemImage: "film"
+			contentMode: .fill
 		)
 		.frame(width: cardWidth, height: cardHeight)
 		.clipShape(

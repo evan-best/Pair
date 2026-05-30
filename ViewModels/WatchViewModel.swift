@@ -90,4 +90,22 @@ final class WatchViewModel {
 			return nil
 		}
 	}
+
+	func fetchRuntime(for id: Int) async -> Int? {
+		do {
+			return try await service.fetchDetail(for: id).runtime
+		} catch {
+			self.error = error.localizedDescription
+			return nil
+		}
+	}
+
+	func fetchCertification(for id: Int) async -> String? {
+		do {
+			return try await service.fetchCertification(for: id)
+		} catch {
+			self.error = error.localizedDescription
+			return nil
+		}
+	}
 }

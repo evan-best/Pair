@@ -33,3 +33,19 @@ struct MovieImage: Decodable, Identifiable {
 
 	var id: String { filePath }
 }
+
+struct MovieDetail: Decodable {
+	let id: Int
+	let runtime: Int?
+}
+
+struct MovieReleaseDatesResponse: Decodable {
+	struct CountryResult: Decodable {
+		let iso31661: String
+		let releaseDates: [ReleaseDate]
+	}
+	struct ReleaseDate: Decodable {
+		let certification: String
+	}
+	let results: [CountryResult]
+}

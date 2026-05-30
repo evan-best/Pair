@@ -11,31 +11,19 @@ struct TMDBImageView: View {
     let path: String?
     let size: TMDBImageSize
     let contentMode: ContentMode
-    let fallbackSystemImage: String
 
     var body: some View {
-        Group {
-            if let imageURL {
-                AsyncImage(url: imageURL, transaction: Transaction(animation: .smooth)) { phase in
-                    switch phase {
-                    case .empty:
-                        TMDBImagePlaceholder(systemImage: fallbackSystemImage)
-                    case .success(let image):
-                        configuredImage(image)
-                    case .failure:
-                        TMDBImagePlaceholder(systemImage: fallbackSystemImage)
-                    @unknown default:
-                        TMDBImagePlaceholder(systemImage: fallbackSystemImage)
-                    }
+        // Drive layout from a flexible base so the loaded image's intrinsic
+        // size can't push the parent's frame around.
+        Color.clear
+            .overlay {
+                AsyncImage(url: Self.url(for: path, size: size)) { image in
+                    configuredImage(image)
+                } placeholder: {
+                    Color.clear
                 }
-            } else {
-                TMDBImagePlaceholder(systemImage: fallbackSystemImage)
             }
-        }
-    }
-
-    private var imageURL: URL? {
-        Self.url(for: path, size: size)
+            .clipped()
     }
 
     @ViewBuilder
@@ -68,18 +56,6 @@ enum TMDBImageSize: String {
     case hero = "w780"
 	case backdrop = "w1280"
 	case logo = "w500"
-}
-
-private struct TMDBImagePlaceholder: View {
-    let systemImage: String
-
-    var body: some View {
-        ZStack {
-            Image(systemName: systemImage)
-                .font(.title2.weight(.medium))
-                .foregroundStyle(.secondary)
-        }
-    }
 }
 
 actor TMDBImagePrefetcher {

@@ -48,8 +48,7 @@ private struct MovieSearchResultRow: View {
 			TMDBImageView(
 				path: movie.posterPath,
 				size: .poster,
-				contentMode: .fill,
-				fallbackSystemImage: "film"
+				contentMode: .fill
 			)
 			.frame(width: 88, height: 128)
 			.clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))

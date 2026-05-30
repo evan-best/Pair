@@ -102,6 +102,24 @@ final class TMDBService {
 	}
 	
 	
+	/// Fetch full detail for a movie (includes runtime).
+	func fetchDetail(for id: Int) async throws -> MovieDetail {
+		try await client.fetch("/3/movie/\(id)")
+	}
+
+	/// Fetch the age-rating certification for a movie in a given region.
+	/// Falls back to US if the requested region has no entry.
+	func fetchCertification(for id: Int, region: String = "CA") async throws -> String? {
+		let response: MovieReleaseDatesResponse = try await client.fetch(
+			"/3/movie/\(id)/release_dates"
+		)
+		let country = response.results.first(where: { $0.iso31661 == region })
+			?? response.results.first(where: { $0.iso31661 == "US" })
+		return country?.releaseDates
+			.first(where: { !$0.certification.isEmpty })?
+			.certification
+	}
+
 	/// Fetch the logo for a movie.
 	/// - Parameters:
 	///   - id: Movie ID.
