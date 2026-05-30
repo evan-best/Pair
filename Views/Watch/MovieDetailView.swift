@@ -34,20 +34,17 @@ struct MovieDetailView: View {
 				}
 				.clipShape(RoundedRectangle(cornerRadius: 30, style: .continuous))
 			.overlay(alignment: .bottom) {
-				VStack(spacing: 16) {
+				VStack(spacing: 6) {
 					// logo if we have one, else fall back to title
 					if let logoPath {
-						TMDBImageView(
-							path: logoPath,
-							size: .logo,
-							contentMode: .fit,
-							fallbackSystemImage: "film"
-						)
-						.frame(maxWidth: 220, maxHeight: 80)
+						AsyncImage(url: URL(string: "https://image.tmdb.org/t/p/w500\(logoPath)")) { phase in
+							if let image = phase.image {
+								image.resizable().scaledToFit()
+							}
+						}
+						.frame(maxWidth: 240, maxHeight: 120)
 					} else {
-						Text(movie.title)
-							.font(.title.bold())
-							.foregroundStyle(.white)
+						Text(movie.title).font(.title.bold()).foregroundStyle(.white)
 					}
 
 					// buttons
