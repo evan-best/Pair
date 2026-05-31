@@ -14,6 +14,7 @@ struct MovieDetailView: View {
 	@State private var runtime: Int?
 	@State private var certification: String?
 	@State private var isReady = false
+	@State private var isOverviewExpanded = false
 	@State private var vm = WatchViewModel()
 
 	var body: some View {
@@ -65,7 +66,7 @@ struct MovieDetailView: View {
 
 	private var heroImage: some View {
 		TMDBImageView(path: movie.backdropPath, size: .backdrop, contentMode: .fill)
-			.frame(height: 520)
+			.frame(height: 580)
 			.frame(maxWidth: .infinity)
 			.overlay(alignment: .bottom) { blurFade }
 			.overlay(alignment: .bottom) { darkenFade }
@@ -101,7 +102,7 @@ struct MovieDetailView: View {
 		VStack(spacing: 12) {
 			logoOrTitle
 			Text(typeAndGenreLine)
-				.font(.footnote)
+				.font(.system(size: 14))
 				.foregroundStyle(.white.opacity(0.85))
 				.padding(.bottom, 8)
 			actionButtons
@@ -139,7 +140,6 @@ struct MovieDetailView: View {
 					.padding(.horizontal, 8)
 			}
 			.buttonStyle(.glass(.regular.tint(.white)))
-			.controlSize(.small)
 
 			Button {
 				// add to watchlist
@@ -147,28 +147,71 @@ struct MovieDetailView: View {
 				Image(systemName: "plus")
 					.foregroundStyle(.white)
 					.fontWeight(.semibold)
-					.padding(6)
 			}
-			.controlSize(.regular)
+			.controlSize(.extraLarge)
 			.buttonStyle(.glass)
 			.buttonBorderShape(.circle)
 		}
 	}
 
 	private var detailsBlock: some View {
-		HStack(spacing: 12) {
-			Text("\(yearText)  •  \(lengthText)")
-				.font(.caption2.weight(.semibold))
-				.foregroundStyle(.white.opacity(0.8))
-			ratingBadge
+		VStack(alignment: .leading, spacing: 10) {
+			overviewBlock
+			HStack(spacing: 12) {
+				Text("\(yearText)  •  \(lengthText)")
+					.font(.system(size: 14).weight(.semibold))
+					.foregroundStyle(.white.opacity(0.8))
+				ratingBadge
+			}
 		}
 		.frame(maxWidth: .infinity, alignment: .leading)
-		.padding(.top, 16)
+		.padding(.top, 4)
+	}
+
+	private var overviewBlock: some View {
+		Text(overviewText)
+			.font(.footnote)
+			.foregroundStyle(.white.opacity(0.85))
+			.lineLimit(isOverviewExpanded ? nil : 2)
+			.multilineTextAlignment(.leading)
+			.frame(maxWidth: .infinity, alignment: .leading)
+			.fixedSize(horizontal: false, vertical: true)
+			.overlay(alignment: .bottomTrailing) {
+				if !isOverviewExpanded {
+					morePill
+				}
+			}
+	}
+
+	private var morePill: some View {
+		Button {
+			withAnimation(.easeInOut(duration: 0.2)) {
+				isOverviewExpanded = true
+			}
+		} label: {
+			Text("MORE")
+				.font(.caption2.weight(.semibold))
+				.foregroundStyle(.white)
+				.padding(.vertical, 2)
+				.padding(.horizontal, 8)
+				.background(.ultraThinMaterial, in: .capsule)
+		}
+		.buttonStyle(.plain)
+	}
+
+	private var overviewText: String {
+		if isOverviewExpanded { return movie.overview }
+		let truncateAt = 100
+		if movie.overview.count <= truncateAt { return movie.overview }
+		let prefixText = String(movie.overview.prefix(truncateAt))
+			.trimmingCharacters(in: .whitespacesAndNewlines)
+		// Trailing non-breaking spaces reserve room for the overlaid pill.
+		return "\(prefixText)…\u{00A0}\u{00A0}\u{00A0}\u{00A0}\u{00A0}\u{00A0}\u{00A0}\u{00A0}"
 	}
 
 	private var ratingBadge: some View {
 		Text(ratingText)
-			.font(.caption2.weight(.semibold))
+			.font(.system(size: 14).weight(.semibold))
 			.foregroundStyle(.white.opacity(0.8))
 			.tracking(-0.2)
 			.foregroundStyle(.white)

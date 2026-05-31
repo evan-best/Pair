@@ -54,7 +54,7 @@ private struct MovieRowSection: View {
 			SectionHeader(title: title)
 
 			ScrollView(.horizontal, showsIndicators: false) {
-				HStack(spacing: 6) {
+				HStack(spacing: 8) {
 					ForEach(movies, id: \.id) { movie in
 						NavigationLink {
 							MovieDetailView(movie: movie)
@@ -91,8 +91,8 @@ private struct SectionHeader: View {
 private struct MovieCardItem: View {
 	let movie: MovieResponse
 
-	private let cardWidth: CGFloat = 110
-	private let cardHeight: CGFloat = 160
+	private let cardWidth: CGFloat = 120
+	private let cardHeight: CGFloat = 170
 	private let cornerRadius: CGFloat = 14
 
 	var body: some View {
